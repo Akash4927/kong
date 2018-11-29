@@ -45,7 +45,10 @@ local function load_plugin_configuration(ctx,
     return ngx.exit(ngx.ERROR)
   end
 
-  if plugin ~= nil and plugin.enabled then
+  if plugin ~= nil and plugin.enabled and (plugin.run_on == "all"    or
+       (not ctx.is_service_mesh_request and plugin.run_on == "first") or
+           (ctx.is_service_mesh_request and plugin.run_on == "second")) then
+
     local cfg = plugin.config or {}
 
     cfg.api_id      = plugin.api and plugin.api.id
